@@ -8,10 +8,12 @@ import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_gifs_list.*
+import okhttp3.ResponseBody
 import org.qtestapp.R
 import org.qtestapp.adapters.GifsRecyclerViewAdapter
 import org.qtestapp.extentions.enqueue
 import org.qtestapp.extentions.getClient
+import org.qtestapp.rest.BaseNetworkResponse
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
@@ -39,6 +41,19 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
             adapter = gifsListAdapter
+        }
+
+        cachedGifsFab.setOnClickListener {
+
+
+            enqueue(getClient().getRawGif("https://media1.giphy.com/media/3o751YUaBEePF6VMJy/200_d.gif"),
+                    object : BaseNetworkResponse<ResponseBody>(this) {
+                        override fun onResult(data: ResponseBody) {
+
+                        }
+                    })
+
+
         }
     }
 
