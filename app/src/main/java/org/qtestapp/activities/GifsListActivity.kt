@@ -15,6 +15,7 @@ import org.qtestapp.adapters.GifsRecyclerViewAdapter
 import org.qtestapp.cache.GifCache
 import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.enqueue
+import org.qtestapp.extentions.getCacheDirectory
 import org.qtestapp.extentions.getClient
 import org.qtestapp.rest.BaseNetworkResponse
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
@@ -44,7 +45,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsSwipeToRefresh.setOnRefreshListener(this)
 
-        val gifCache = GifCache.getInstance(cacheDir, GifCachePolicy())
+        val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
 
         gifsListAdapter = GifsRecyclerViewAdapter(this,
                 R.layout.gif_list_item,

@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import org.qtestapp.R
@@ -29,7 +28,7 @@ class CachedGifsRecyclerViewAdapter(
     override fun onBindViewHolder(holder: CachedGifItemViewHolder?, position: Int) {
         with(holder) {
             this?.let {
-                deleteButton.setOnClickListener {
+                deleteImageView.setOnClickListener {
                     val pos: Int = holder?.adapterPosition!!
                     gifCache.remove(data[pos])
                     data.removeAt(pos)
@@ -45,7 +44,7 @@ class CachedGifsRecyclerViewAdapter(
     class CachedGifItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val gifImageView: ImageView = itemView.findViewById(R.id.gifImageView)
-        val deleteButton: Button = itemView.findViewById(R.id.deleteButton)
+        val deleteImageView: ImageView = itemView.findViewById(R.id.deleteImageView)
 
         fun loadGifFromCache(context: Context, uri: URI) {
             Glide

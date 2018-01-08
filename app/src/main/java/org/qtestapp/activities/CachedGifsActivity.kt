@@ -8,6 +8,7 @@ import org.qtestapp.R
 import org.qtestapp.adapters.CachedGifsRecyclerViewAdapter
 import org.qtestapp.cache.GifCache
 import org.qtestapp.cache.GifCachePolicy
+import org.qtestapp.extentions.getCacheDirectory
 
 class CachedGifsActivity : BaseActivity() {
 
@@ -22,7 +23,7 @@ class CachedGifsActivity : BaseActivity() {
 
     override fun init() {
 
-        val gifCache = GifCache.getInstance(cacheDir, GifCachePolicy())
+        val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
 
         gifsListAdapter = CachedGifsRecyclerViewAdapter(this,
                 R.layout.cached_gif_list_item,
