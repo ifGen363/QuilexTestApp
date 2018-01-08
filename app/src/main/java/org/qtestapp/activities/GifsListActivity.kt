@@ -39,10 +39,19 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsSwipeToRefresh.setOnRefreshListener(this)
 
+        val gifCache = GifCache(cacheDir, GifCachePolicy())
+
         gifsListAdapter = GifsRecyclerViewAdapter(this,
                 R.layout.gif_list_item,
-                GifCache(cacheDir, GifCachePolicy()),
-                { })
+                gifCache,
+                { url ->
+                    enqueue(getClient().getRawGif(url),
+                            object : BaseNetworkResponse<ResponseBody>(this) {
+                                override fun onResult(data: ResponseBody) {
+                                   gifCache.put(url, data.byteStream())
+                                }
+                            })
+                })
 
         with(gifsListRecyclerView) {
             setHasFixedSize(true)

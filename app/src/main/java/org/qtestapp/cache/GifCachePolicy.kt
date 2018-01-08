@@ -28,6 +28,7 @@ class GifCachePolicy : CachePolicy {
             println("Done!")
 
         } catch (e: IOException) {
+            e.printStackTrace()
             throw IOException("Something went wrong while writing fil: " + file)
         } finally {
             try {

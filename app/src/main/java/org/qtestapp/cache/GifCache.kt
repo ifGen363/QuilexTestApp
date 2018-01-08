@@ -8,12 +8,14 @@ import java.io.InputStream
  */
 class GifCache(override val cacheDirectory: File, override val policy: CachePolicy) : Cache<String, GifCacheValue> {
 
-    private var cachedFiles: LinkedHashMap<Int, GifCacheValue> = LinkedHashMap()
+    private var cachedFiles: HashMap<Int, GifCacheValue> = HashMap()
 
     init {
         val files = cacheDirectory.listFiles()
-        files.forEach {
-            cachedFiles.put(it.name.hashCode(), GifCacheValue(it))
+        files.forEach { file ->
+            file.name.toIntOrNull()?.let {
+                cachedFiles.put(it, GifCacheValue(file))
+            }
         }
     }
 
@@ -22,7 +24,7 @@ class GifCache(override val cacheDirectory: File, override val policy: CachePoli
     }
 
     override fun put(key: String, inputStream: InputStream) {
-        val file = File(key.hashCode().toString())
+        val file = File(cacheDirectory, key.hashCode().toString())
         policy.save(inputStream, file)
         cachedFiles.put(key.hashCode(), GifCacheValue(file))
     }

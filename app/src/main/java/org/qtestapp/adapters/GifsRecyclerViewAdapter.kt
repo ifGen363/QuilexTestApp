@@ -18,25 +18,27 @@ import java.net.URI
 class GifsRecyclerViewAdapter(private val context: Context,
                               private val layoutRes: Int,
                               private val gifCache: GifCache,
-                              var cacheAction: () -> Unit = {}) :
+                              private var cacheAction: (url: String) -> Unit = {}) :
         BaseRecyclerViewAdapter<GifsRecyclerViewAdapter.GifItemViewHolder, String>() {
 
 
     override fun onBindViewHolder(holder: GifItemViewHolder?, position: Int) {
         with(holder) {
             this?.let {
-                it.isCachedCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                    if(isChecked) {
-                        cacheAction()
-                    }
-                }
-
                 gifCache.get(data[position])?.file?.let {
                     isCachedCheckBox.isChecked = true
                     loadGifFromCache(context, it.toURI())
                 } ?: run {
                     isCachedCheckBox.isChecked = false
                     loadGifFromUrl(context, data[position])
+                }
+
+                it.isCachedCheckBox.setOnClickListener {
+                    if (isCachedCheckBox.isChecked) {
+                        cacheAction(data[position])
+                    } else {
+                        gifCache.remove(data[position])
+                    }
                 }
             }
         }
