@@ -11,17 +11,20 @@ import kotlinx.android.synthetic.main.activity_gifs_list.*
 import okhttp3.ResponseBody
 import org.qtestapp.R
 import org.qtestapp.adapters.GifsRecyclerViewAdapter
+import org.qtestapp.cache.GifCache
+import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.enqueue
 import org.qtestapp.extentions.getClient
 import org.qtestapp.rest.BaseNetworkResponse
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
+import java.io.File
 
 
 class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
 
-    private val gifsListAdapter = GifsRecyclerViewAdapter(this, R.layout.gif_list_item)
+    private lateinit var gifsListAdapter: GifsRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,11 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsSwipeToRefresh.setOnRefreshListener(this)
 
+        gifsListAdapter = GifsRecyclerViewAdapter(this,
+                R.layout.gif_list_item,
+                GifCache(cacheDir, GifCachePolicy()),
+                { })
+
         with(gifsListRecyclerView) {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -45,15 +53,13 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         cachedGifsFab.setOnClickListener {
 
-
             enqueue(getClient().getRawGif("https://media1.giphy.com/media/3o751YUaBEePF6VMJy/200_d.gif"),
                     object : BaseNetworkResponse<ResponseBody>(this) {
                         override fun onResult(data: ResponseBody) {
-
+                            var policy = GifCachePolicy()
+                            policy.save(data.byteStream(), File(cacheDir, "gif"))
                         }
                     })
-
-
         }
     }
 

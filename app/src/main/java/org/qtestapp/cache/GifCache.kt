@@ -1,35 +1,40 @@
 package org.qtestapp.cache
 
 import java.io.File
+import java.io.InputStream
 
 /**
  * Created by MartulEI on 04.01.2018.
  */
-class GifCache(override val cacheDirectory: File) : Cache<String, GifCacheValue> {
+class GifCache(override val cacheDirectory: File, override val policy: CachePolicy) : Cache<String, GifCacheValue> {
 
-    private var cachedFiles: LinkedHashMap<String, GifCacheValue> = LinkedHashMap()
+    private var cachedFiles: LinkedHashMap<Int, GifCacheValue> = LinkedHashMap()
 
     init {
-        cacheDirectory.mkdirs()
-
+        val files = cacheDirectory.listFiles()
+        files.forEach {
+            cachedFiles.put(it.name.hashCode(), GifCacheValue(it))
+        }
     }
 
     override fun get(key: String): GifCacheValue? {
-        return cachedFiles[key]
+        return cachedFiles[key.hashCode()]
     }
 
-    override fun put(key: String, value: GifCacheValue): Boolean {
-        cachedFiles.put(key, value)
-        //key.hashCode()
-        return true
+    override fun put(key: String, inputStream: InputStream) {
+        val file = File(key.hashCode().toString())
+        policy.save(inputStream, file)
+        cachedFiles.put(key.hashCode(), GifCacheValue(file))
     }
 
     override fun remove(key: String) {
-
+        get(key)?.file?.let { policy.delete(it) }
+        cachedFiles.remove(key.hashCode())
     }
 
     override fun clear() {
-
+        policy.clear(cacheDirectory)
+        cachedFiles.clear()
     }
 }
 
