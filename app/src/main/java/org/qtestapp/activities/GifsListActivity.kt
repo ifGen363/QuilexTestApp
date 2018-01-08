@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_gifs_list.*
 import okhttp3.ResponseBody
+import org.jetbrains.anko.startActivity
 import org.qtestapp.R
 import org.qtestapp.adapters.GifsRecyclerViewAdapter
 import org.qtestapp.cache.GifCache
@@ -19,7 +20,6 @@ import org.qtestapp.rest.BaseNetworkResponse
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
-import java.io.File
 
 
 class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
@@ -35,20 +35,25 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
         refreshData()
     }
 
+    override fun onStart() {
+        super.onStart()
+        gifsListAdapter.notifyDataSetChanged()
+    }
+
     override fun init() {
 
         gifsSwipeToRefresh.setOnRefreshListener(this)
 
-        val gifCache = GifCache(cacheDir, GifCachePolicy())
+        val gifCache = GifCache.getInstance(cacheDir, GifCachePolicy())
 
         gifsListAdapter = GifsRecyclerViewAdapter(this,
                 R.layout.gif_list_item,
                 gifCache,
-                { url ->
+                { id, url ->
                     enqueue(getClient().getRawGif(url),
                             object : BaseNetworkResponse<ResponseBody>(this) {
                                 override fun onResult(data: ResponseBody) {
-                                   gifCache.put(url, data.byteStream())
+                                    gifCache.put(id, data.byteStream())
                                 }
                             })
                 })
@@ -61,14 +66,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
         }
 
         cachedGifsFab.setOnClickListener {
-
-            enqueue(getClient().getRawGif("https://media1.giphy.com/media/3o751YUaBEePF6VMJy/200_d.gif"),
-                    object : BaseNetworkResponse<ResponseBody>(this) {
-                        override fun onResult(data: ResponseBody) {
-                            var policy = GifCachePolicy()
-                            policy.save(data.byteStream(), File(cacheDir, "gif"))
-                        }
-                    })
+            startActivity<CachedGifsActivity>()
         }
     }
 
@@ -111,7 +109,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         enqueue(call, object : SwipeToRefreshNetworkResponse<GifsRootModel>(this, gifsSwipeToRefresh) {
             override fun onResult(data: GifsRootModel) {
-                gifsListAdapter.resetData(data.gifUrls)
+                gifsListAdapter.resetData(data.data)
             }
         })
     }
