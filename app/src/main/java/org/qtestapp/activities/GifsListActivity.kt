@@ -60,9 +60,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
                                                   })
 
         with(gifsListRecyclerView) {
-            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            itemAnimator = DefaultItemAnimator()
             adapter = gifsListAdapter
         }
 

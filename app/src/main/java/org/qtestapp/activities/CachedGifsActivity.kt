@@ -30,9 +30,7 @@ class CachedGifsActivity : BaseActivity() {
                                                         gifCache)
 
         with(gifsListRecyclerView) {
-            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            itemAnimator = DefaultItemAnimator()
             adapter = gifsListAdapter
         }
 
