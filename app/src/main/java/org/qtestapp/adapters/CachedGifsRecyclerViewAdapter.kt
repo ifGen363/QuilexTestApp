@@ -1,6 +1,7 @@
 package org.qtestapp.adapters
 
 import android.content.Context
+import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,7 @@ import java.net.URI
  */
 class CachedGifsRecyclerViewAdapter(
         val context: Context,
-        private val layoutRes: Int,
+        @LayoutRes private val layoutRes: Int,
         private val gifCache: GifCache) : BaseRecyclerViewAdapter<CachedGifsRecyclerViewAdapter.CachedGifItemViewHolder, String>() {
 
 
