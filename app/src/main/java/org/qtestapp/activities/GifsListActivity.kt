@@ -108,7 +108,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         enqueue(call, object : SwipeToRefreshNetworkResponse<GifsRootModel>(this, gifsSwipeToRefresh) {
             override fun onResult(data: GifsRootModel) {
-                gifsListAdapter.resetData(data.data)
+                gifsListAdapter.resetData(data.gifsList)
             }
         })
     }
