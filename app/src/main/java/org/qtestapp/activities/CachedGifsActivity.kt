@@ -26,8 +26,8 @@ class CachedGifsActivity : BaseActivity() {
         val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
 
         gifsListAdapter = CachedGifsRecyclerViewAdapter(this,
-                R.layout.cached_gif_list_item,
-                gifCache)
+                                                        R.layout.cached_gif_list_item,
+                                                        gifCache)
 
         with(gifsListRecyclerView) {
             setHasFixedSize(true)
