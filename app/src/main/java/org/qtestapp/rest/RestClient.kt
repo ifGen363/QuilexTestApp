@@ -1,9 +1,11 @@
 package org.qtestapp.rest
 
+import okhttp3.ResponseBody
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 
 /**
@@ -19,6 +21,9 @@ interface RestClient {
         const val TRANDING_LIST = "/v1/gifs/trending"
         const val SEARCH = "/v1/gifs/search"
     }
+
+    @GET
+    fun getRawGif(@Url url: String): Call<ResponseBody>
 
     @GET(TRANDING_LIST)
     fun getGifsList(@Query("api_key") key: String = API_KEY): Call<GifsRootModel>
