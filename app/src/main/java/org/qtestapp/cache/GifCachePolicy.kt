@@ -2,9 +2,7 @@ package org.qtestapp.cache
 
 import java.io.*
 
-/**
- * Created by ifgen on 08.01.2018.
- */
+
 class GifCachePolicy : CachePolicy {
 
     override fun save(inputStream: InputStream, file: File) {

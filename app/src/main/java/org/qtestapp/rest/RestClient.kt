@@ -8,24 +8,20 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 
 
-/**
- * Created by ifgen on 15.11.17.
- */
-
 interface RestClient {
 
     companion object {
 
         const val API_KEY = "VpQgoHGHFUmM4setbHbAs32Il3TEB3ZF"
 
-        const val TRANDING_LIST = "/v1/gifs/trending"
+        const val TRENDING_LIST = "/v1/gifs/trending"
         const val SEARCH = "/v1/gifs/search"
     }
 
     @GET
     fun getRawGif(@Url url: String): Call<ResponseBody>
 
-    @GET(TRANDING_LIST)
+    @GET(TRENDING_LIST)
     fun getGifsList(@Query("api_key") key: String = API_KEY): Call<GifsRootModel>
 
     @GET(SEARCH)
