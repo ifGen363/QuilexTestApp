@@ -21,10 +21,10 @@ class CachedGifsRecyclerViewAdapter(
 
 
     override fun onBindViewHolder(holder: CachedGifItemViewHolder?, position: Int) {
-        with(holder) {
-            this?.let {
+        holder?.let {
+            with(it) {
                 deleteImageView.setOnClickListener {
-                    val pos: Int = holder?.adapterPosition!!
+                    val pos: Int = adapterPosition
                     gifCache.remove(data[pos])
                     data.removeAt(pos)
                     notifyItemRemoved(pos)

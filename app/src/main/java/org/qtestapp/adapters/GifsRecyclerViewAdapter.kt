@@ -18,8 +18,8 @@ class GifsRecyclerViewAdapter(private val context: Context,
 
 
     override fun onBindViewHolder(holder: GifItemViewHolder?, position: Int) {
-        with(holder) {
-            this?.let {
+        holder?.let {
+            with(it) {
 
                 val id: String = data[position].id
                 val url: String = data[position].images?.fixedHeightDownsampled?.url!!
