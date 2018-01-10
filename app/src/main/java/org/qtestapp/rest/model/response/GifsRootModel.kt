@@ -8,12 +8,5 @@ import java.util.ArrayList
 data class GifsRootModel (
         @SerializedName("data")
         @Expose
-        var data: List<GifData> = ArrayList()
-) {
-    var gifUrls: List<String> = ArrayList()
-        get() {
-            return data.map {
-                it -> it.images?.fixedHeightDownsampled?.url!!
-            }
-        }
-}
+        var gifsList: List<GifData> = ArrayList()
+)
