@@ -1,18 +1,17 @@
 package org.qtestapp.cache
 
 import java.io.File
-import java.io.InputStream
 
 
-interface Cache<K, out V : CacheValue> {
+interface Cache<K, V> {
     val cacheDirectory: File
     val policy: CachePolicy
-    fun get(key: K): V?
-    fun put(key: K, inputStream: InputStream)
-    fun remove(key: K)
-    fun clear()
-}
+    fun put(key: K, value: V, listener: CacheResultCallback)
+    fun remove(key: K, listener: CacheResultCallback)
 
-interface CacheValue {
-    val file: File
+    interface CacheResultCallback {
+        fun onStart()
+        fun onSuccess()
+        fun onFailure(error: Throwable)
+    }
 }

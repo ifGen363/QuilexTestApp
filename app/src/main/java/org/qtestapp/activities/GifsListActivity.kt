@@ -2,22 +2,21 @@ package org.qtestapp.activities
 
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_gifs_list.*
-import okhttp3.ResponseBody
 import org.jetbrains.anko.startActivity
 import org.qtestapp.R
-import org.qtestapp.adapters.GifsRecyclerViewAdapter
+import org.qtestapp.adapters.LikeActionItemConfiguration
+import org.qtestapp.adapters.SimpleGifAdapter
 import org.qtestapp.cache.GifCache
 import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.enqueue
 import org.qtestapp.extentions.getCacheDirectory
 import org.qtestapp.extentions.getClient
-import org.qtestapp.rest.BaseNetworkResponse
+import org.qtestapp.loader.UrlGifLoader
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
@@ -25,7 +24,7 @@ import retrofit2.Call
 
 class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
 
-    private lateinit var gifsListAdapter: GifsRecyclerViewAdapter
+    private lateinit var gifsListAdapter: SimpleGifAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,17 +46,10 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
 
-        gifsListAdapter = GifsRecyclerViewAdapter(this,
-                                                  R.layout.gif_list_item,
-                                                  gifCache,
-                                                  { id, url ->
-                                                      enqueue(getClient().getRawGif(url),
-                                                              object : BaseNetworkResponse<ResponseBody>(this) {
-                                                                  override fun onResult(data: ResponseBody) {
-                                                                      gifCache.put(id, data.byteStream())
-                                                                  }
-                                                              })
-                                                  })
+        gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
+                                           gifCache,
+                                           UrlGifLoader(),
+                                           LikeActionItemConfiguration())
 
         with(gifsListRecyclerView) {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

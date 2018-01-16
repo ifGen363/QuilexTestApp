@@ -5,6 +5,7 @@ import java.io.*
 
 class GifCachePolicy : CachePolicy {
 
+    @Throws(CacheIOException::class)
     override fun save(inputStream: InputStream, file: File) {
 
         var outputStream: OutputStream? = null
@@ -23,11 +24,9 @@ class GifCachePolicy : CachePolicy {
                 } else break
             }
 
-            println("Done!")
-
         } catch (e: IOException) {
             e.printStackTrace()
-            throw IOException("Something went wrong while writing fil: " + file)
+            throw CacheIOException("Something went wrong while writing file: " + file)
         } finally {
             try {
                 inputStream.close()
@@ -42,14 +41,12 @@ class GifCachePolicy : CachePolicy {
         }
     }
 
+    @Throws(CacheIOException::class)
     override fun delete(file: File) {
-        file.delete()
-    }
-
-    override fun clear(directory: File) {
-        if (directory.isDirectory) {
-            val files = directory.listFiles()
-            files.forEach { it.delete() }
+        if (!file.delete()) {
+            throw CacheIOException("Something went wrong while deleting file: " + file)
         }
     }
 }
+
+class CacheIOException(message: String) : Exception(message)

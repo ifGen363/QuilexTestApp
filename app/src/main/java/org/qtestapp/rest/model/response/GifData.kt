@@ -11,4 +11,7 @@ data class GifData(
         @SerializedName("images")
         @Expose
         var images: Images? = null
-)
+) {
+    var url: String? = ""
+        get() = this.images?.fixedHeightDownsampled?.url
+}
