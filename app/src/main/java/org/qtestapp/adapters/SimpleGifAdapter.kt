@@ -29,7 +29,6 @@ class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
     override fun onBindViewHolder(holder: SimpleGifViewHolder?, position: Int) {
         holder?.run {
             configure(gifCache, gifs[position])
-            showGif(gifs[position], gifCache)
         }
     }
 
@@ -48,11 +47,7 @@ class SimpleGifViewHolder(itemView: View,
 
 
     fun configure(gifCache: GifCache, gifData: GifData) {
-        itemConfig.configureItem(actionView, gifCache, gifData)
-    }
-
-    fun showGif(gifData: GifData, gifCache: GifCache) {
-        itemConfig.showGif(gifImageView, gifData, gifCache)
+        itemConfig.configureItem(actionView, gifImageView, gifCache, gifData)
     }
 }
 

@@ -11,8 +11,7 @@ import org.qtestapp.rest.model.response.GifData
 
 interface ItemConfiguration<out T : GifLoader<out Source<*>>> {
     val loader: T
-    fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData)
-    fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache)
+    fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifData: GifData)
     var action: CacheAction
 }
 
@@ -26,7 +25,7 @@ abstract class DefaultItemConfiguration<out T : GifLoader<out Source<*>>> : Item
             cacheAction = value
         }
 
-    override fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData) {
+    override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifData: GifData) {
         actionView.setOnClickListener {
             action.execute(gifCache, gifData)
         }
@@ -35,7 +34,10 @@ abstract class DefaultItemConfiguration<out T : GifLoader<out Source<*>>> : Item
 
 class LikeActionItemConfiguration(override val loader: UrlGifLoader) : DefaultItemConfiguration<UrlGifLoader>() {
 
-    override fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData) {
+    override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifData: GifData) {
+
+        gifData.url?.let { loader.loadToView(gifView, UrlSource(it)) }
+
         if (gifCache.isInGifInCache(gifData)) {
             actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.like_background)
             action = DeleteAction(GifCacheResultCallback())
@@ -44,27 +46,21 @@ class LikeActionItemConfiguration(override val loader: UrlGifLoader) : DefaultIt
             action = SaveAction(GifCacheResultCallback())
         }
 
-        super.configureItem(actionView, gifCache, gifData)
-    }
-
-    override fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache) {
-        gifData.url?.let { loader.loadToView(gifView, UrlSource(it)) }
+        super.configureItem(actionView, gifView, gifCache, gifData)
     }
 }
 
 
 class DeleteActionItemConfiguration(override val loader: FileGifLoader) : DefaultItemConfiguration<FileGifLoader>() {
 
+    override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifData: GifData) {
 
-    override fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData) {
+        gifCache.get(gifData)?.let { loader.loadToView(gifView, FileSource(it)) }
+
         actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.ic_delete_black_24dp)
         action = DeleteAction(GifCacheResultCallback())
 
-        super.configureItem(actionView, gifCache, gifData)
-    }
-
-    override fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache) {
-        gifCache.get(gifData)?.let { loader.loadToView(gifView, FileSource(it)) }
+        super.configureItem(actionView, gifView, gifCache, gifData)
     }
 }
 
