@@ -16,7 +16,7 @@ import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.enqueue
 import org.qtestapp.extentions.getCacheDirectory
 import org.qtestapp.extentions.getClient
-import org.qtestapp.loader.UrlGifLoader
+import org.qtestapp.loader.GifLoader
 import org.qtestapp.rest.SwipeToRefreshNetworkResponse
 import org.qtestapp.rest.model.response.GifsRootModel
 import retrofit2.Call
@@ -48,7 +48,8 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,
-                                           LikeActionItemConfiguration(UrlGifLoader()))
+                                           GifLoader(),
+                                           LikeActionItemConfiguration())
 
         with(gifsListRecyclerView) {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

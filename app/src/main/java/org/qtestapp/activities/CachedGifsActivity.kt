@@ -9,7 +9,7 @@ import org.qtestapp.adapters.SimpleGifAdapter
 import org.qtestapp.cache.GifCache
 import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.getCacheDirectory
-import org.qtestapp.loader.FileGifLoader
+import org.qtestapp.loader.GifLoader
 
 class CachedGifsActivity : BaseActivity() {
 
@@ -28,7 +28,8 @@ class CachedGifsActivity : BaseActivity() {
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,
-                                           DeleteActionItemConfiguration(FileGifLoader()))
+                                           GifLoader(),
+                                           DeleteActionItemConfiguration())
 
         with(gifsListRecyclerView) {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

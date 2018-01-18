@@ -9,13 +9,13 @@ import android.widget.ImageView
 import org.qtestapp.R
 import org.qtestapp.cache.GifCache
 import org.qtestapp.loader.GifLoader
-import org.qtestapp.loader.Source
 import org.qtestapp.rest.model.response.GifData
 
 
 class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
                        private val gifCache: GifCache,
-                       private val itemConfiguration: ItemConfiguration<GifLoader<out Source<*>>>)
+                       private val gifLoader: GifLoader,
+                       private val itemConfiguration: ItemConfiguration)
     : RecyclerView.Adapter<SimpleGifViewHolder>() {
 
     private var gifs: MutableList<GifData> = ArrayList()
@@ -28,26 +28,25 @@ class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
 
     override fun onBindViewHolder(holder: SimpleGifViewHolder?, position: Int) {
         holder?.run {
-            configure(gifCache, gifs[position])
+            configure(gifCache, gifs[position], gifLoader)
         }
     }
 
     override fun getItemCount(): Int = gifs.size
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SimpleGifViewHolder
-            = SimpleGifViewHolder(LayoutInflater.from(parent?.context).inflate(layoutRes, parent, false),
-                                  itemConfiguration)
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SimpleGifViewHolder = SimpleGifViewHolder(LayoutInflater.from(parent?.context).inflate(layoutRes, parent, false),
+                                                                                                                  itemConfiguration)
 }
 
 class SimpleGifViewHolder(itemView: View,
-                          private val itemConfig: ItemConfiguration<GifLoader<out Source<*>>>) : RecyclerView.ViewHolder(itemView) {
+                          private val itemConfig: ItemConfiguration) : RecyclerView.ViewHolder(itemView) {
 
     private val gifImageView: ImageView = itemView.findViewById(R.id.gifImageView)
     private val actionView: ImageView = itemView.findViewById(R.id.actionView)
 
 
-    fun configure(gifCache: GifCache, gifData: GifData) {
-        itemConfig.configureItem(actionView, gifImageView, gifCache, gifData)
+    fun configure(gifCache: GifCache, gifData: GifData, gifLoader: GifLoader) {
+        itemConfig.configureItem(actionView, gifImageView, gifCache, gifLoader, gifData)
     }
 }
 

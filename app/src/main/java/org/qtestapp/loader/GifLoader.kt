@@ -5,36 +5,19 @@ import com.bumptech.glide.Glide
 import java.io.File
 
 
-interface Source<S> {
-    val source: S
-}
+class GifLoader {
 
-class UrlSource(override val source: String) : Source<String>
-
-class FileSource(override val source: File) : Source<File>
-
-
-interface GifLoader<T : Source<*>> {
-    fun loadToView(view: ImageView, from: T)
-}
-
-
-class UrlGifLoader : GifLoader<UrlSource> {
-
-    override fun loadToView(view: ImageView, from: UrlSource) {
+    fun loadToView(view: ImageView, from: String) {
         Glide
                 .with(view.context)
-                .load(from.source)
+                .load(from)
                 .into(view)
     }
-}
 
-class FileGifLoader : GifLoader<FileSource> {
-
-    override fun loadToView(view: ImageView, from: FileSource) {
+    fun loadToView(view: ImageView, from: File) {
         Glide
                 .with(view.context)
-                .load(from.source)
+                .load(from)
                 .into(view)
     }
 }
