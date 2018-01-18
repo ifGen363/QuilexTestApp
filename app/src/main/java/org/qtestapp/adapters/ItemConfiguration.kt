@@ -4,7 +4,6 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.ImageView
 import org.qtestapp.R
-import org.qtestapp.cache.Cache
 import org.qtestapp.cache.GifCache
 import org.qtestapp.loader.*
 import org.qtestapp.rest.model.response.GifData
@@ -75,14 +74,14 @@ interface CacheAction {
 }
 
 
-class SaveAction(private val cacheResult: Cache.CacheResultCallback) : CacheAction {
+class SaveAction(private val cacheResult: GifCache.CacheResultCallback) : CacheAction {
 
     override fun execute(gifCache: GifCache, gifData: GifData) {
         gifCache.put(gifData, cacheResult)
     }
 }
 
-class DeleteAction(private val cacheResult: Cache.CacheResultCallback) : CacheAction {
+class DeleteAction(private val cacheResult: GifCache.CacheResultCallback) : CacheAction {
 
     override fun execute(gifCache: GifCache, gifData: GifData) {
         gifCache.remove(gifData, cacheResult)
@@ -90,10 +89,7 @@ class DeleteAction(private val cacheResult: Cache.CacheResultCallback) : CacheAc
 }
 
 
-class GifCacheResultCallback : Cache.CacheResultCallback {
-    override fun onStart() {
-        System.out.print("Start")
-    }
+class GifCacheResultCallback : GifCache.CacheResultCallback {
 
     override fun onSuccess() {
         System.out.print("Success")

@@ -7,8 +7,8 @@ import java.net.URL
 import java.util.*
 
 
-class GifCache private constructor(override val cacheDirectory: File,
-                                   override val policy: CachePolicy) : Cache<String, GifData> {
+class GifCache private constructor(private val cacheDirectory: File,
+                                   private val policy: CachePolicy) {
 
     private var cachedFiles: HashMap<String, File> = HashMap()
 
@@ -35,8 +35,7 @@ class GifCache private constructor(override val cacheDirectory: File,
     private fun getAllFileNames() = cacheDirectory.listFiles().map { it.name }
 
 
-    override fun put(key: String, value: GifData, listener: Cache.CacheResultCallback) {
-        listener.onStart()
+    private fun put(key: String, value: GifData, listener: CacheResultCallback) {
         val file = File(cacheDirectory, value.id)
         try {
             doAsync {
@@ -46,12 +45,11 @@ class GifCache private constructor(override val cacheDirectory: File,
             ex.printStackTrace()
             listener.onFailure(ex)
         }
-        cachedFiles.put(value.id, file)
+        cachedFiles.put(key, file)
         listener.onSuccess()
     }
 
-    override fun remove(key: String, listener: Cache.CacheResultCallback) {
-        listener.onStart()
+    private fun remove(key: String, listener: CacheResultCallback) {
         try {
             get(key)?.let { policy.delete(it) }
         } catch (ex: CacheIOException) {
@@ -63,19 +61,25 @@ class GifCache private constructor(override val cacheDirectory: File,
     }
 
 
-    fun get(key: String): File? = cachedFiles[key]
+    private fun get(key: String): File? = cachedFiles[key]
 
     fun get(value: GifData): File? = get(value.id)
 
-    fun put(value: GifData, listener: Cache.CacheResultCallback) {
+    fun put(value: GifData, listener: CacheResultCallback) {
         put(value.id, value, listener)
     }
 
-    fun remove(gifData: GifData, listener: Cache.CacheResultCallback) {
+    fun remove(gifData: GifData, listener: CacheResultCallback) {
         remove(gifData.id, listener)
     }
 
     fun isInGifInCache(gifData: GifData): Boolean = get(gifData.id)?.let { true } ?: run { false }
 
     fun getCachedGifData() = getAllFileNames().map { GifData(it) }
+
+
+    interface CacheResultCallback {
+        fun onSuccess()
+        fun onFailure(error: Throwable)
+    }
 }
