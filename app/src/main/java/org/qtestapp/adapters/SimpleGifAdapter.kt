@@ -9,13 +9,13 @@ import android.widget.ImageView
 import org.qtestapp.R
 import org.qtestapp.cache.GifCache
 import org.qtestapp.loader.GifLoader
+import org.qtestapp.loader.Source
 import org.qtestapp.rest.model.response.GifData
 
 
 class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
                        private val gifCache: GifCache,
-                       private val gifLoader: GifLoader,
-                       private val itemConfiguration: ItemConfiguration)
+                       private val itemConfiguration: ItemConfiguration<GifLoader<out Source<*>>>)
     : RecyclerView.Adapter<SimpleGifViewHolder>() {
 
     private var gifs: MutableList<GifData> = ArrayList()
@@ -29,7 +29,7 @@ class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
     override fun onBindViewHolder(holder: SimpleGifViewHolder?, position: Int) {
         holder?.run {
             configure(gifCache, gifs[position])
-            showGif(gifLoader, gifs[position], gifCache)
+            showGif(gifs[position], gifCache)
         }
     }
 
@@ -41,7 +41,7 @@ class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
 }
 
 class SimpleGifViewHolder(itemView: View,
-                          private val itemConfig: ItemConfiguration) : RecyclerView.ViewHolder(itemView) {
+                          private val itemConfig: ItemConfiguration<GifLoader<out Source<*>>>) : RecyclerView.ViewHolder(itemView) {
 
     private val gifImageView: ImageView = itemView.findViewById(R.id.gifImageView)
     private val actionView: ImageView = itemView.findViewById(R.id.actionView)
@@ -51,8 +51,8 @@ class SimpleGifViewHolder(itemView: View,
         itemConfig.configureItem(actionView, gifCache, gifData)
     }
 
-    fun showGif(gifLoader: GifLoader, gifData: GifData, gifCache: GifCache) {
-        itemConfig.showGif(gifImageView, gifLoader, gifData, gifCache)
+    fun showGif(gifData: GifData, gifCache: GifCache) {
+        itemConfig.showGif(gifImageView, gifData, gifCache)
     }
 }
 

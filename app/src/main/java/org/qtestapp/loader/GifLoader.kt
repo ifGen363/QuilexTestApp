@@ -5,34 +5,36 @@ import com.bumptech.glide.Glide
 import java.io.File
 
 
-interface GifLoader {
-    fun loadToView(view: ImageView, source: Any?)
+interface Source<S> {
+    val source: S
 }
 
-class UrlGifLoader : GifLoader {
+class UrlSource(override val source: String) : Source<String>
 
-    override fun loadToView(view: ImageView, source: Any?) {
-        if (source is String) {
-            Glide
-                    .with(view.context)
-                    .load(source)
-                    .into(view)
-        } else {
-            throw RuntimeException("Source is not an url string")
-        }
+class FileSource(override val source: File) : Source<File>
+
+
+interface GifLoader<T : Source<*>> {
+    fun loadToView(view: ImageView, from: T)
+}
+
+
+class UrlGifLoader : GifLoader<UrlSource> {
+
+    override fun loadToView(view: ImageView, from: UrlSource) {
+        Glide
+                .with(view.context)
+                .load(from.source)
+                .into(view)
     }
 }
 
-class FileGifLoader : GifLoader {
+class FileGifLoader : GifLoader<FileSource> {
 
-    override fun loadToView(view: ImageView, source: Any?) {
-        if (source is File) {
-            Glide
-                    .with(view.context)
-                    .load(source)
-                    .into(view)
-        } else {
-            throw RuntimeException("Source is not a file")
-        }
+    override fun loadToView(view: ImageView, from: FileSource) {
+        Glide
+                .with(view.context)
+                .load(from.source)
+                .into(view)
     }
 }

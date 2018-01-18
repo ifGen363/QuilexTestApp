@@ -28,8 +28,7 @@ class CachedGifsActivity : BaseActivity() {
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,
-                                           FileGifLoader(),
-                                           DeleteActionItemConfiguration())
+                                           DeleteActionItemConfiguration(FileGifLoader()))
 
         with(gifsListRecyclerView) {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

@@ -6,17 +6,18 @@ import android.widget.ImageView
 import org.qtestapp.R
 import org.qtestapp.cache.Cache
 import org.qtestapp.cache.GifCache
-import org.qtestapp.loader.GifLoader
+import org.qtestapp.loader.*
 import org.qtestapp.rest.model.response.GifData
 
 
-interface ItemConfiguration {
+interface ItemConfiguration<out T : GifLoader<out Source<*>>> {
+    val loader: T
     fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData)
-    fun showGif(gifView: ImageView, gifLoader: GifLoader, gifData: GifData, gifCache: GifCache)
+    fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache)
     var action: CacheAction
 }
 
-abstract class DefaultItemConfiguration : ItemConfiguration {
+abstract class DefaultItemConfiguration<out T : GifLoader<out Source<*>>> : ItemConfiguration<T> {
 
     private lateinit var cacheAction: CacheAction
 
@@ -33,7 +34,7 @@ abstract class DefaultItemConfiguration : ItemConfiguration {
     }
 }
 
-class LikeActionItemConfiguration : DefaultItemConfiguration() {
+class LikeActionItemConfiguration(override val loader: UrlGifLoader) : DefaultItemConfiguration<UrlGifLoader>() {
 
     override fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData) {
         if (gifCache.isInGifInCache(gifData)) {
@@ -47,13 +48,13 @@ class LikeActionItemConfiguration : DefaultItemConfiguration() {
         super.configureItem(actionView, gifCache, gifData)
     }
 
-    override fun showGif(gifView: ImageView, gifLoader: GifLoader, gifData: GifData, gifCache: GifCache) {
-        gifLoader.loadToView(gifView, gifData.url)
+    override fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache) {
+        gifData.url?.let { loader.loadToView(gifView, UrlSource(it)) }
     }
 }
 
 
-class DeleteActionItemConfiguration : DefaultItemConfiguration() {
+class DeleteActionItemConfiguration(override val loader: FileGifLoader) : DefaultItemConfiguration<FileGifLoader>() {
 
 
     override fun configureItem(actionView: View, gifCache: GifCache, gifData: GifData) {
@@ -63,8 +64,8 @@ class DeleteActionItemConfiguration : DefaultItemConfiguration() {
         super.configureItem(actionView, gifCache, gifData)
     }
 
-    override fun showGif(gifView: ImageView, gifLoader: GifLoader, gifData: GifData, gifCache: GifCache) {
-        gifLoader.loadToView(gifView, gifCache.get(gifData))
+    override fun showGif(gifView: ImageView, gifData: GifData, gifCache: GifCache) {
+        gifCache.get(gifData)?.let { loader.loadToView(gifView, FileSource(it)) }
     }
 }
 
