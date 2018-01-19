@@ -18,6 +18,17 @@ class SimpleGifAdapter(@LayoutRes private val layoutRes: Int,
                        private val itemConfiguration: ItemConfiguration)
     : RecyclerView.Adapter<SimpleGifViewHolder>() {
 
+    init {
+        gifCache.addStateListener(object : GifCache.CacheStateListener {
+            override fun onStateChanged(gifData: GifData) {
+                val index = gifs.indexOf(gifData)
+                if (index != -1) {
+                    this@SimpleGifAdapter.notifyItemChanged(index)
+                }
+            }
+        })
+    }
+
     private var gifs: MutableList<GifData> = ArrayList()
 
     fun resetData(newData: List<GifData>) {

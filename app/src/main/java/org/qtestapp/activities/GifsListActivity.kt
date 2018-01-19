@@ -12,7 +12,6 @@ import org.qtestapp.R
 import org.qtestapp.adapters.LikeActionItemConfiguration
 import org.qtestapp.adapters.SimpleGifAdapter
 import org.qtestapp.cache.GifCache
-import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.enqueue
 import org.qtestapp.extentions.getCacheDirectory
 import org.qtestapp.extentions.getClient
@@ -44,7 +43,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsSwipeToRefresh.setOnRefreshListener(this)
 
-        val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
+        val gifCache = GifCache.getInstance(getCacheDirectory())
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,

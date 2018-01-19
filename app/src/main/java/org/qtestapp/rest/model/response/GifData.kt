@@ -14,4 +14,9 @@ data class GifData(
 ) {
     var url: String? = ""
         get() = this.images?.fixedHeightDownsampled?.url
+
+    override fun equals(other: Any?): Boolean {
+
+        return this.id == (other as? GifData)?.id
+    }
 }

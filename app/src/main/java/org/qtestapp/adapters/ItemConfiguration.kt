@@ -44,6 +44,17 @@ class LikeActionItemConfiguration : DefaultItemConfiguration() {
         } else {
             actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.ignore_background)
             action = SaveAction(GifCacheResultCallback())
+            /* action = SaveAction(object : GifCache.CacheResultCallback {
+                 override fun onSuccess() {
+                     //action = DeleteAction(GifCacheResultCallback())
+                     //actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.like_background)
+                     actionView.visibility = View.INVISIBLE
+                 }
+
+                 override fun onFailure(error: Throwable) {
+                     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                 }
+             })*/
         }
 
         super.configureItem(actionView, gifView, gifCache, gifLoader, gifData)

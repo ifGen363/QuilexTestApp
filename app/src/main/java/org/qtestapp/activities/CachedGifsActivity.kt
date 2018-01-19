@@ -7,7 +7,6 @@ import org.qtestapp.R
 import org.qtestapp.adapters.DeleteActionItemConfiguration
 import org.qtestapp.adapters.SimpleGifAdapter
 import org.qtestapp.cache.GifCache
-import org.qtestapp.cache.GifCachePolicy
 import org.qtestapp.extentions.getCacheDirectory
 import org.qtestapp.loader.GifLoader
 
@@ -24,7 +23,7 @@ class CachedGifsActivity : BaseActivity() {
 
     override fun init() {
 
-        val gifCache = GifCache.getInstance(getCacheDirectory(), GifCachePolicy())
+        val gifCache = GifCache.getInstance(getCacheDirectory())
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,
