@@ -25,6 +25,9 @@ abstract class DefaultItemConfiguration : ItemConfiguration {
         }
 
     override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifLoader: GifLoader, gifData: GifData) {
+
+        gifLoader.loadToView(gifView, gifData)
+
         actionView.setOnClickListener {
             action.execute(gifCache, gifData)
         }
@@ -35,9 +38,7 @@ class LikeActionItemConfiguration : DefaultItemConfiguration() {
 
     override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifLoader: GifLoader, gifData: GifData) {
 
-        gifData.url?.let { gifLoader.loadToView(gifView, it) }
-
-        if (gifCache.isInGifInCache(gifData)) {
+        if (gifCache.isGifInCache(gifData)) {
             actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.like_background)
             action = DeleteAction(GifCacheResultCallback())
         } else {
@@ -53,8 +54,6 @@ class LikeActionItemConfiguration : DefaultItemConfiguration() {
 class DeleteActionItemConfiguration : DefaultItemConfiguration() {
 
     override fun configureItem(actionView: View, gifView: ImageView, gifCache: GifCache, gifLoader: GifLoader, gifData: GifData) {
-
-        gifCache.get(gifData)?.let { gifLoader.loadToView(gifView, it) }
 
         actionView.background = ContextCompat.getDrawable(actionView.context, R.drawable.ic_delete_black_24dp)
         action = DeleteAction(GifCacheResultCallback())

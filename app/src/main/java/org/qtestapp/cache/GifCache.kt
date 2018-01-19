@@ -4,13 +4,12 @@ import org.jetbrains.anko.doAsync
 import org.qtestapp.rest.model.response.GifData
 import java.io.File
 import java.net.URL
-import java.util.*
 
 
 class GifCache private constructor(private val cacheDirectory: File,
                                    private val policy: CachePolicy) {
 
-    private var cachedFiles: HashMap<String, File> = HashMap()
+    private val cachedGifs: MutableList<GifData>
 
     companion object {
 
@@ -26,16 +25,14 @@ class GifCache private constructor(private val cacheDirectory: File,
     }
 
     init {
-        val files = cacheDirectory.listFiles()
-        files.forEach { file ->
-            cachedFiles.put(file.name, file)
-        }
+        cachedGifs = getCachedGifData().toMutableList()
     }
 
-    private fun getAllFileNames() = cacheDirectory.listFiles().map { it.name }
+    fun getFile(value: GifData): File? = File(cacheDirectory, value.id)
 
+    fun getAllCachedGifs() = ArrayList<GifData>(cachedGifs)
 
-    private fun put(key: String, value: GifData, listener: CacheResultCallback) {
+    fun put(value: GifData, listener: CacheResultCallback) {
         val file = File(cacheDirectory, value.id)
         try {
             doAsync {
@@ -45,38 +42,26 @@ class GifCache private constructor(private val cacheDirectory: File,
             ex.printStackTrace()
             listener.onFailure(ex)
         }
-        cachedFiles.put(key, file)
+        cachedGifs.add(value)
         listener.onSuccess()
     }
 
-    private fun remove(key: String, listener: CacheResultCallback) {
+    fun remove(value: GifData, listener: CacheResultCallback) {
         try {
-            get(key)?.let { policy.delete(it) }
+            getFile(value)?.let { policy.delete(it) }
         } catch (ex: CacheIOException) {
             ex.printStackTrace()
             listener.onFailure(ex)
         }
-        cachedFiles.remove(key)
+        cachedGifs.remove(value)
         listener.onSuccess()
     }
 
+    fun isGifInCache(value: GifData): Boolean = File(cacheDirectory, value.id).exists()
 
-    private fun get(key: String): File? = cachedFiles[key]
+    private fun getCachedGifData() = getAllFileNames().map { GifData(it) }
 
-    fun get(value: GifData): File? = get(value.id)
-
-    fun put(value: GifData, listener: CacheResultCallback) {
-        put(value.id, value, listener)
-    }
-
-    fun remove(gifData: GifData, listener: CacheResultCallback) {
-        remove(gifData.id, listener)
-    }
-
-    fun isInGifInCache(gifData: GifData): Boolean = get(gifData.id)?.let { true } ?: run { false }
-
-    fun getCachedGifData() = getAllFileNames().map { GifData(it) }
-
+    private fun getAllFileNames() = cacheDirectory.listFiles().map { it.name }
 
     interface CacheResultCallback {
         fun onSuccess()

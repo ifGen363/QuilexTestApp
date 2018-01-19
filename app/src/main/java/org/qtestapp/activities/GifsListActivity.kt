@@ -48,7 +48,7 @@ class GifsListActivity : BaseActivity(), SearchView.OnQueryTextListener, SwipeRe
 
         gifsListAdapter = SimpleGifAdapter(R.layout.gif_list_item,
                                            gifCache,
-                                           GifLoader(),
+                                           GifLoader(gifCache),
                                            LikeActionItemConfiguration())
 
         with(gifsListRecyclerView) {
