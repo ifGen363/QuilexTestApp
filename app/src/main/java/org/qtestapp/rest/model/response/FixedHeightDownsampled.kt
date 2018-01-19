@@ -7,5 +7,5 @@ import com.google.gson.annotations.SerializedName
 data class FixedHeightDownsampled(
         @SerializedName("url")
         @Expose
-        var url: String? = ""
+        val url: String? = ""
 )
