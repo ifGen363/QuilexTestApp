@@ -8,5 +8,5 @@ import java.util.ArrayList
 data class GifsRootModel (
         @SerializedName("data")
         @Expose
-        var gifsList: List<GifData> = ArrayList()
+        val gifsList: List<GifData> = ArrayList()
 )

@@ -1,57 +1,134 @@
 package org.qtestapp.cache
 
-import java.io.File
-import java.io.InputStream
+import android.os.Handler
+import android.os.Looper
+import org.jetbrains.anko.doAsync
+import org.qtestapp.rest.model.response.GifData
+import java.io.*
+import java.net.URL
 
-/**
- * Created by MartulEI on 04.01.2018.
- */
-class GifCache private constructor(override val cacheDirectory: File,
-                                   override val policy: CachePolicy) : Cache<String, GifCacheValue> {
 
-    private var cachedFiles: HashMap<String, GifCacheValue> = HashMap()
+class GifCache private constructor(private val cacheDirectory: File) {
+
+    private val cachedGifs: MutableList<GifData>
+    private var stateListener: CacheStateListener? = null
 
     companion object {
 
         private var instance: GifCache? = null
 
-        fun getInstance(cacheDirectory: File,
-                        policy: CachePolicy): GifCache {
+        fun getInstance(cacheDirectory: File): GifCache {
+
             if (instance == null) {
-                instance = GifCache(cacheDirectory, policy)
+                instance = GifCache(cacheDirectory)
             }
             return instance as GifCache
         }
     }
 
     init {
-        val files = cacheDirectory.listFiles()
-        files.forEach { file ->
-            cachedFiles.put(file.name, GifCacheValue(file))
+        cachedGifs = getCachedGifData().toMutableList()
+    }
+
+    fun addStateListener(listener: CacheStateListener) {
+        stateListener = listener
+    }
+
+    fun getFile(value: GifData): File? = File(cacheDirectory, value.id)
+
+    fun getAllCachedGifs() = ArrayList<GifData>(cachedGifs)
+
+    fun put(value: GifData, listener: CacheResultCallback) {
+        val file = File(cacheDirectory, value.id)
+        try {
+            doAsync {
+                saveFile(URL(value.url).openStream(), file)
+                Handler(Looper.getMainLooper()).post {
+                    cachedGifs.add(value)
+                    listener.onSuccess()
+                    stateListener?.onStateChanged(value)
+                }
+            }
+        } catch (ex: CacheIOException) {
+            ex.printStackTrace()
+            listener.onFailure(ex)
         }
     }
 
-    fun getAllFileNames() = cacheDirectory.listFiles().map { it.name }
-
-    override fun get(key: String): GifCacheValue? {
-        return cachedFiles[key]
+    fun remove(value: GifData, listener: CacheResultCallback) {
+        try {
+            doAsync {
+                getFile(value)?.let { deleteFile(it) }
+                Handler(Looper.getMainLooper()).post {
+                    cachedGifs.remove(value)
+                    listener.onSuccess()
+                    stateListener?.onStateChanged(value)
+                }
+            }
+        } catch (ex: CacheIOException) {
+            ex.printStackTrace()
+            listener.onFailure(ex)
+        }
     }
 
-    override fun put(key: String, inputStream: InputStream) {
-        val file = File(cacheDirectory, key)
-        policy.save(inputStream, file)
-        cachedFiles.put(key, GifCacheValue(file))
+    fun isGifInCache(value: GifData): Boolean = File(cacheDirectory, value.id).exists()
+
+    private fun getCachedGifData() = getAllFileNames().map { GifData(it) }
+
+    private fun getAllFileNames() = cacheDirectory.listFiles().map { it.name }
+
+
+    @Throws(CacheIOException::class)
+    private fun saveFile(inputStream: InputStream, file: File) {
+
+        var outputStream: OutputStream? = null
+
+        try {
+            file.createNewFile()
+            outputStream = FileOutputStream(file)
+
+            var read = 0
+            val bytes = ByteArray(1024)
+
+            while (true) {
+                read = inputStream.read(bytes)
+                if (read != -1) {
+                    outputStream.write(bytes, 0, read)
+                } else break
+            }
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            throw CacheIOException("Something went wrong while writing file: " + file)
+        } finally {
+            try {
+                inputStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            try {
+                outputStream?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
     }
 
-    override fun remove(key: String) {
-        get(key)?.file?.let { policy.delete(it) }
-        cachedFiles.remove(key)
+    @Throws(CacheIOException::class)
+    private fun deleteFile(file: File) {
+        if (!file.delete()) {
+            throw CacheIOException("Something went wrong while deleting file: " + file)
+        }
     }
 
-    override fun clear() {
-        policy.clear(cacheDirectory)
-        cachedFiles.clear()
+    interface CacheResultCallback {
+        fun onSuccess()
+        fun onFailure(error: Throwable)
+    }
+
+    interface CacheStateListener {
+        fun onStateChanged(gifData: GifData)
     }
 }
 
-class GifCacheValue(override val file: File) : CacheValue
+class CacheIOException(message: String) : IOException(message)
